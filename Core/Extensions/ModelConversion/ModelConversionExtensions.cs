@@ -60,5 +60,18 @@ namespace Core.Extensions.ModelConversion
             return command;
         }
 
+
+        public static UpdateTaskCommand ToUpdateTaskCommand(this TaskVm model)
+        {
+            var command = new UpdateTaskCommand()
+            {
+                Id = model.Id,
+                Subject = model.Subject,
+                IsComplete = model.IsComplete,
+                AssignedMemberId = model.AssignedMemberId
+            };
+            return command;
+        }
+
     }
 }

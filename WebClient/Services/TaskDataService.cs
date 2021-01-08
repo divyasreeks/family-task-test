@@ -50,12 +50,29 @@ namespace WebClient.Services
             //TasksUpdated?.Invoke(this, null);
         }
 
-        public void ToggleTask(Guid id)
+        //public void ToggleTask(Guid id)
+        //{
+        //    foreach (var taskModel in Tasks)
+        //    {
+        //        if (taskModel.Id == id)
+        //        {
+        //            UpdateTask()
+        //            //taskModel.IsDone = !taskModel.IsDone;
+        //            taskModel.IsComplete = !taskModel.IsComplete;
+        //        }
+        //    }
+
+        //    TasksUpdated?.Invoke(this, null);
+        //}
+
+        public void ToggleTask(TaskVm model)
         {
             foreach (var taskModel in Tasks)
             {
-                if (taskModel.Id == id)
+                if (taskModel.Id == model.Id)
                 {
+                    model.IsComplete = true;
+                    UpdateTask(model);
                     //taskModel.IsDone = !taskModel.IsDone;
                     taskModel.IsComplete = !taskModel.IsComplete;
                 }
@@ -81,19 +98,13 @@ namespace WebClient.Services
             return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
         }
 
+        private async Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command)
+        {
+            return await httpClient.PutJsonAsync<UpdateTaskCommandResult>($"tasks/{command.Id}", command);
+        }
 
-        //public void AddTask(TaskModel model)
-        //{
-        //    try
-        //    {
-        //        //Tasks.Add(model);
-        //        //TasksUpdated?.Invoke(this, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
+
+       
 
         public async Task AddTask(TaskVm model)
         {
@@ -109,7 +120,7 @@ namespace WebClient.Services
                     TasksUpdated?.Invoke(this, null);
                     return;
                 }
-               // UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
+                // UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
             }
 
             //UpdateMemberFailed?.Invoke(this, "Unable to save changes.");
@@ -126,6 +137,11 @@ namespace WebClient.Services
         public void AddTask(TaskModel model)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task UpdateTask(TaskVm model)
+        {
+            var result = await Update(model.ToUpdateTaskCommand());
         }
     }
 }

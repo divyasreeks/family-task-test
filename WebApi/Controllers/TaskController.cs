@@ -45,26 +45,26 @@ namespace WebApi.Controllers
 
 
 
-        //[HttpPut("{id}")]
-        //[ProducesResponseType(typeof(UpdateMemberCommandResult), StatusCodes.Status200OK)]
-        //public async Task<IActionResult> Update(Guid id, UpdateMemberCommand command)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(UpdateTaskCommandResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(Guid id, UpdateTaskCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //    try
-        //    {
-        //        var result = await _memberService.UpdateMemberCommandHandler(command);
+            try
+            {
+                var result = await _taskService.UpdateTaskCommandHandler(command);
 
-        //        return Ok(result);
-        //    }
-        //    catch (NotFoundException<Guid>)
-        //    {
-        //        return NotFound();
-        //    }            
-        //}
+                return Ok(result);
+            }
+            catch (NotFoundException<Guid>)
+            {
+                return NotFound();
+            }
+        }
 
         [HttpGet]
         [ProducesResponseType(typeof(GetAllTasksQueryResult), StatusCodes.Status200OK)]
