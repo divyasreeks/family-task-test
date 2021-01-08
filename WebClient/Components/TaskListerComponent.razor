@@ -60,7 +60,7 @@
                 </Check>
             </div>
             <div class="col-2 p-0 d-flex justify-content-end align-items-center">
-                @if (item.AssignedMemberId != null)
+                @if (item.AssignedMemberId != null && item.AssignedMemberId!= Guid.Empty && selectedMember !=null)
                 {
                     <div class="avtar mr-1" style="background-color: @selectedMember.Avatar;"></div>
                 }
