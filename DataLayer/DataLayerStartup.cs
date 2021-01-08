@@ -12,6 +12,8 @@ namespace DataLayer
         public static void AddDatalayer(this IServiceCollection services)
         {
             services.AddTransient<IMemberRepository, MemberRepository>();
+            services.AddTransient<ITaskRepository, TaskRepository>();
+
         }
     }
 }

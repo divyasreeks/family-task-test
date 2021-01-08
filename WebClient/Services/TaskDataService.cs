@@ -3,30 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using WebClient.Abstractions;
 using WebClient.Shared.Models;
+using Core.Extensions.ModelConversion;
+using System.Threading.Tasks;
+using Domain.Commands;
+using System.Net.Http;
+using Microsoft.AspNetCore.Components;
+using Domain.ViewModel;
+using Domain.Queries;
 
 namespace WebClient.Services
 {
-    public class TaskDataService: ITaskDataService
+    public class TaskDataService : ITaskDataService
     {
-        public TaskDataService()
+        private readonly HttpClient httpClient;
+        public TaskDataService(IHttpClientFactory clientFactory)
         {
-            Tasks = new List<TaskModel>();
+            httpClient = clientFactory.CreateClient("FamilyTaskAPI");
+            tasks = new List<TaskVm>();
+            LoadTasks();
         }
 
 
+        //public List<TaskModel> Tasks { get; private set; }
+        public TaskVm SelectedTask { get; private set; }
 
-
-        public List<TaskModel> Tasks { get; private set; }
-        public TaskModel SelectedTask { get; private set; }
+        public IEnumerable<TaskVm> tasks;
+        public IEnumerable<TaskVm> Tasks => tasks;
 
 
         public event EventHandler TasksUpdated;
         public event EventHandler TaskSelected;
 
+        private async void LoadTasks()
+        {
+            tasks = (await GetAllTasks()).Payload;
+            TasksUpdated?.Invoke(this, null);
+        }
         public void SelectTask(Guid id)
         {
-            SelectedTask = Tasks.SingleOrDefault(t => t.Id == id);
-            TasksUpdated?.Invoke(this, null);
+            if (tasks.All(taskVm => taskVm.Id != id)) return;
+            {
+                SelectedTask = tasks.SingleOrDefault(taskVm => taskVm.Id == id);
+                TasksUpdated?.Invoke(this, null);
+            }
+            //SelectedTask = Tasks.SingleOrDefault(t => t.Id == id);
+            //TasksUpdated?.Invoke(this, null);
         }
 
         public void ToggleTask(Guid id)
@@ -35,17 +56,76 @@ namespace WebClient.Services
             {
                 if (taskModel.Id == id)
                 {
-                    taskModel.IsDone = !taskModel.IsDone;
+                    //taskModel.IsDone = !taskModel.IsDone;
+                    taskModel.IsComplete = !taskModel.IsComplete;
                 }
             }
 
             TasksUpdated?.Invoke(this, null);
         }
 
+        private async Task<CreateTaskCommandResult> Create(CreateTaskCommand command)
+        {
+            try
+            {
+                return await httpClient.PostJsonAsync<CreateTaskCommandResult>("tasks", command);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private async Task<GetAllTasksQueryResult> GetAllTasks()
+        {
+            return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
+        }
+
+
+        //public void AddTask(TaskModel model)
+        //{
+        //    try
+        //    {
+        //        //Tasks.Add(model);
+        //        //TasksUpdated?.Invoke(this, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
+
+        public async Task AddTask(TaskVm model)
+        {
+
+            var result = await Create(model.ToCreateTaskCommand());
+            if (result != null)
+            {
+                var updatedList = (await GetAllTasks()).Payload;
+
+                if (updatedList != null)
+                {
+                    tasks = updatedList;
+                    TasksUpdated?.Invoke(this, null);
+                    return;
+                }
+               // UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
+            }
+
+            //UpdateMemberFailed?.Invoke(this, "Unable to save changes.");
+
+        }
+
+
+        private async Task<GetAllTasksQueryResult> GetAllMembers()
+        {
+            return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
+        }
+
+
         public void AddTask(TaskModel model)
         {
-            Tasks.Add(model);
-            TasksUpdated?.Invoke(this, null);
+            throw new NotImplementedException();
         }
     }
 }

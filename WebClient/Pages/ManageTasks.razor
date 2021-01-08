@@ -8,17 +8,19 @@
 @inject IMemberDataService memberService;
 @inject ITaskDataService taskDataService;
 
-@if(isLoaded) {
+@if (isLoaded)
+{
     <div class="page-wrapper row m-0 col-12 p-0">
         <div class="col-4 p-0">
             <LeftMenu />
         </div>
         <div class="col-8 p-0">
-            @if (showLister) {
+            @if (showLister)
+            {
                 <div class="col-10 offset-1 pt-5">
                     <div class="row m-0">
                         <Field class="col-9 p-0 custom-input">
-                            <TextEdit Placeholder="Enter New Task" @bind-text="@newTask"/>
+                            <TextEdit Placeholder="Enter New Task" @bind-text="@newTask" />
                         </Field>
                         <div class="col-3 p-0 text-right">
                             <Button class="add-btn px-4" @onclick="@OnAddItem">Add</Button>
@@ -29,7 +31,8 @@
                     <TaskListerComponent />
                 </div>
             }
-            @if(false) {
+            @if (false)
+            {
                 <div class="col-10 offset-1 pt-5">
                 </div>
             }
@@ -54,22 +57,28 @@
     }
 
 
-    
+
 
     private void OnAddItem()
     {
-        var task = new TaskModel()
+        var task = new TaskVm()
         {
             Id = Guid.NewGuid(),
-            IsDone = false,
-            Text = newTask
+            IsComplete = false,
+            Subject = newTask
         };
+        //var task = new TaskModel()
+        //{
+        //    Id = Guid.NewGuid(),
+        //    IsDone = false,
+        //    Text = newTask
+        //};
 
         newTask = string.Empty;
 
         if (memberService.SelectedMember != null)
         {
-            task.Member = memberService.SelectedMember.Id;
+            task.AssignedMemberId = memberService.SelectedMember.Id;
         }
         taskDataService.AddTask(task);
         StateHasChanged();
