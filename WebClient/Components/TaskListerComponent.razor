@@ -8,7 +8,7 @@
 @namespace WebClient.Components
 
 <style>
-   
+
 
     .draggable {
         margin-bottom: 10px;
@@ -72,31 +72,32 @@
 <div class="task-wrapper">
     @if (tasks != null)
     {
-    @foreach (var item in tasks)
-    {
-        <div class="task-item p-3 my-3 row m-0 draggable" draggable="true" @ondragstart="@(() => HandleDragStart(item))">
-            <div class="col-10 p-0">
-                <Check TValue="bool" Checked="@item.IsComplete" CheckedChanged="@(val => ToggleTask(item))">
-                    <span class="@(item.IsComplete ? "done-text" : "")">@item.Subject</span>
-                </Check>
+        @foreach (var item in tasks)
+        {
+            <div class="task-item p-3 my-3 row m-0 draggable" draggable="true" @ondragstart="@(() => HandleDragStart(item))">
+                <div class="col-10 p-0">
+                    <Check TValue="bool" Checked="@item.IsComplete" CheckedChanged="@(val => ToggleTask(item))">
+                        <span class="@(item.IsComplete ? "done-text" : "")">@item.Subject</span>
+                    </Check>
+                </div>
+
+                <div class="col-2 p-0 d-flex justify-content-end align-items-center">
+                    @if (item.AssignedMemberId != null && item.AssignedMemberId != Guid.Empty && item.Avatar != null)
+                    {
+                        <div class="avtar" style="background-color: @item.Avatar;"></div>
+                    }
+                    <img class="delete-icon" src="/assets/images/delete-icon.svg" />
+                </div>
             </div>
-            <div class="col-2 p-0 d-flex justify-content-end align-items-center">
-                @if (item.AssignedMemberId != null && item.AssignedMemberId != Guid.Empty && selectedMember != null)
-                {
-                    <div class="avtar mr-1" style="background-color: @selectedMember.Avatar;"></div>
-                }
-                <img class="delete-icon" src="/assets/images/delete-icon.svg" />
-            </div>
-        </div>
-    }
-    }
+        }}
+
 </div>
 
 @code  {
     //private List<TaskModel> tasks = new List<TaskModel>();
     private IEnumerable<TaskVm> tasks;
     private MemberVm selectedMember;
-
+    private IEnumerable<MemberVm> members;
 
     string dropClass = "";
 
@@ -131,9 +132,25 @@
     public void LoadCurrentTasks()
     {
         selectedMember = memberService.SelectedMember;
-
+        string selectedActiveMember = string.Empty;
+        members = memberService.Members;
+        tasks = taskService.Tasks;
+        foreach (var taskData in tasks)
+        {
+            if (taskData.AssignedMemberId != null && taskData.AssignedMemberId != Guid.Empty)
+            {
+                var activeMember = members.Where(x => x.Id == taskData.AssignedMemberId).FirstOrDefault();
+                selectedActiveMember = activeMember.Avatar;
+            }
+            else
+            {
+                selectedActiveMember = string.Empty;
+            }
+            taskData.Avatar = selectedActiveMember;
+        }
         if (selectedMember == null || selectedMember.Id == Guid.Empty)
         {
+            ///members = memberService.Members;
             tasks = taskService.Tasks;
             StateHasChanged();
             return;
@@ -141,6 +158,7 @@
 
 
         tasks = taskService.Tasks.Where(t => t.AssignedMemberId == selectedMember.Id).ToList();
+
         StateHasChanged();
     }
     private void HandleDragStart(TaskVm model)

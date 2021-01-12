@@ -12,9 +12,6 @@ namespace Domain.ViewModel
         public bool IsComplete { get; set; }
         public Guid? AssignedMemberId { get; set; }
 
-        //public UpdateTaskCommand ToUpdateCommand()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public string Avatar { get; set; } //property added for All Task view - to show Avatar image
     }
 }
