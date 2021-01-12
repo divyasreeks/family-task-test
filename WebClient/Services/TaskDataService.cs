@@ -39,6 +39,8 @@ namespace WebClient.Services
             tasks = (await GetAllTasks()).Payload;
             TasksUpdated?.Invoke(this, null);
         }
+
+        
         public void SelectTask(Guid id)
         {
             if (tasks.All(taskVm => taskVm.Id != id)) return;
@@ -50,20 +52,7 @@ namespace WebClient.Services
             //TasksUpdated?.Invoke(this, null);
         }
 
-        //public void ToggleTask(Guid id)
-        //{
-        //    foreach (var taskModel in Tasks)
-        //    {
-        //        if (taskModel.Id == id)
-        //        {
-        //            UpdateTask()
-        //            //taskModel.IsDone = !taskModel.IsDone;
-        //            taskModel.IsComplete = !taskModel.IsComplete;
-        //        }
-        //    }
-
-        //    TasksUpdated?.Invoke(this, null);
-        //}
+        
 
         public void ToggleTask(TaskVm model)
         {
@@ -142,6 +131,12 @@ namespace WebClient.Services
         public async Task UpdateTask(TaskVm model)
         {
             var result = await Update(model.ToUpdateTaskCommand());
+        }
+
+        public async void LoadAllTasks()
+        {
+            tasks = (await GetAllTasks()).Payload;
+            TasksUpdated?.Invoke(this, null);
         }
     }
 }

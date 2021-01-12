@@ -9,6 +9,9 @@
 
 @inject WebClient.Abstractions.IMemberDataService memberService
 @inject WebClient.Abstractions.ITaskDataService taskService
+@inject NavigationManager NavManager
+@*<WebClient.Components.TaskListerComponent @ref="myTaskPage"></WebClient.Components.TaskListerComponent>*@
+
 <style>
     .menu-wrapper {
         background: #FBFBFB;
@@ -86,8 +89,9 @@
         {
             if (item.label == "All Tasks")
             {
-                <div class="menu-item col-10 offset-1 p-3 my-4 p-sm-2">
-                   <Link class="label custom-btn py-2 px-5 mx-2 py-sm-1 px-sm-3" To="manage-tasks" Title="All Tasks"/>
+                <div class="menu-item col-10 offset-1 p-3 my-4 p-sm-2" @onclick="@onAllTaskClick">
+                    @*<Button class="label custom-btn py-2 px-5 mx-2 py-sm-1 px-sm-3" @onclick="@onAllTaskClick">All Tasks</Button>*@
+                    @*<Link class="label custom-btn py-2 px-5 mx-2 py-sm-1 px-sm-3" To="manage-tasks" Title="All Tasks" />*@
                     All Tasks
                 </div>
             }
@@ -111,6 +115,7 @@
 
 @code {
     private IEnumerable<TaskVm> tasks;
+    private WebClient.Components.TaskListerComponent myTaskPage;
     protected override Task OnInitializedAsync()
     {
         MenuItems = new List<MenuItem> { new MenuItem() { label = "All Tasks" } };
@@ -165,12 +170,21 @@
 
     void SelectMember(Guid id)
     {
-            memberService.SelectMember(id);
+        memberService.SelectMember(id);
     }
 
     private void OnAddItem()
     {
         memberService.SelectNullMember();
+        NavManager.NavigateTo("/members");
+    }
+
+    private void onAllTaskClick()
+    {
+        taskService.LoadAllTasks();
+        memberService.SelectNullMember();
+        NavManager.NavigateTo("/manage-tasks");
+
     }
 
 }
