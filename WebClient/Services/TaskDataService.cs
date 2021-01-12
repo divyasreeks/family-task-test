@@ -10,6 +10,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Components;
 using Domain.ViewModel;
 using Domain.Queries;
+using System.Text.Json;
 
 namespace WebClient.Services
 {
@@ -131,6 +132,20 @@ namespace WebClient.Services
         public async Task UpdateTask(TaskVm model)
         {
             var result = await Update(model.ToUpdateTaskCommand());
+            Console.WriteLine(JsonSerializer.Serialize(result));
+
+            if (result != null)
+            {
+                var updatedList = (await GetAllMembers()).Payload;
+
+                if (updatedList != null)
+                {
+                    tasks = updatedList;
+                    TasksUpdated?.Invoke(this, null);
+                    return;
+                }
+                //   UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
+            }
         }
 
         public async void LoadAllTasks()

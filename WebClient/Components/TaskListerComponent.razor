@@ -8,6 +8,25 @@
 @namespace WebClient.Components
 
 <style>
+   
+
+    .draggable {
+        margin-bottom: 10px;
+        padding: 10px 25px;
+        border: 1px solid #424d5c;
+        cursor: move;
+        background: #5c6b7f;
+        border-radius: 5px;
+    }
+
+        .draggable:active {
+            cursor: move;
+        }
+
+    .dragging {
+        cursor: move;
+    }
+
     .task-wrapper .task-item {
         background: #FFFFFF;
         border: 1px solid #C5C9C9;
@@ -55,7 +74,7 @@
     {
     @foreach (var item in tasks)
     {
-        <div class="task-item p-3 my-3 row m-0">
+        <div class="task-item p-3 my-3 row m-0 draggable" draggable="true" @ondragstart="@(() => HandleDragStart(item))">
             <div class="col-10 p-0">
                 <Check TValue="bool" Checked="@item.IsComplete" CheckedChanged="@(val => ToggleTask(item))">
                     <span class="@(item.IsComplete ? "done-text" : "")">@item.Subject</span>
@@ -74,9 +93,13 @@
 </div>
 
 @code  {
-        //private List<TaskModel> tasks = new List<TaskModel>();
+    //private List<TaskModel> tasks = new List<TaskModel>();
     private IEnumerable<TaskVm> tasks;
     private MemberVm selectedMember;
+    [CascadingParameter] TaskVm selectedTask { get; set; }
+
+
+    string dropClass = "";
 
     protected override Task OnInitializedAsync()
     {
@@ -86,11 +109,6 @@
         return base.OnInitializedAsync();
     }
 
-    //private void ToggleTask(TaskModel model)
-    //{
-    //    taskService.ToggleTask(model.Id);
-    //    StateHasChanged();
-    //}
 
     private void ToggleTask(TaskVm model)
     {
@@ -100,7 +118,7 @@
 
     private void TaskServiceOnTasksUpdated(object sender, EventArgs e)
     {
-          LoadCurrentTasks();
+        LoadCurrentTasks();
     }
 
     private void MemberServiceOnSelectedMemberChanged(object sender, EventArgs e)
@@ -125,6 +143,11 @@
 
         tasks = taskService.Tasks.Where(t => t.AssignedMemberId == selectedMember.Id).ToList();
         StateHasChanged();
+    }
+    private void HandleDragStart(TaskVm model)
+    {
+        taskService.SelectTask(model.Id);
+        selectedTask = taskService.Tasks.Where(t => t.Id == model.Id).FirstOrDefault();
     }
 
 }
