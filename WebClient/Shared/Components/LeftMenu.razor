@@ -132,7 +132,6 @@
 @code {
     private IEnumerable<TaskVm> tasks;
     string dropClass = "";
-    [CascadingParameter] TaskVm selectedTask { get; set; }
 
     protected override Task OnInitializedAsync()
     {

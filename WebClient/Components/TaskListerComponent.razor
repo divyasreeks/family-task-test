@@ -96,7 +96,6 @@
     //private List<TaskModel> tasks = new List<TaskModel>();
     private IEnumerable<TaskVm> tasks;
     private MemberVm selectedMember;
-    [CascadingParameter] TaskVm selectedTask { get; set; }
 
 
     string dropClass = "";
@@ -147,7 +146,6 @@
     private void HandleDragStart(TaskVm model)
     {
         taskService.SelectTask(model.Id);
-        selectedTask = taskService.Tasks.Where(t => t.Id == model.Id).FirstOrDefault();
     }
 
 }
