@@ -24,8 +24,6 @@ namespace WebClient.Services
             LoadTasks();
         }
 
-
-        //public List<TaskModel> Tasks { get; private set; }
         public TaskVm SelectedTask { get; private set; }
 
         public IEnumerable<TaskVm> tasks;
@@ -49,8 +47,6 @@ namespace WebClient.Services
                 SelectedTask = tasks.SingleOrDefault(taskVm => taskVm.Id == id);
                 TasksUpdated?.Invoke(this, null);
             }
-            //SelectedTask = Tasks.SingleOrDefault(t => t.Id == id);
-            //TasksUpdated?.Invoke(this, null);
         }
 
         
@@ -61,9 +57,8 @@ namespace WebClient.Services
             {
                 if (taskModel.Id == model.Id)
                 {
-                    model.IsComplete = true;
+                    model.IsComplete = !model.IsComplete;
                     UpdateTask(model);
-                    //taskModel.IsDone = !taskModel.IsDone;
                     taskModel.IsComplete = !taskModel.IsComplete;
                 }
             }
@@ -79,6 +74,7 @@ namespace WebClient.Services
             }
             catch (Exception ex)
             {
+                
                 throw ex;
             }
         }
@@ -110,10 +106,7 @@ namespace WebClient.Services
                     TasksUpdated?.Invoke(this, null);
                     return;
                 }
-                // UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
             }
-
-            //UpdateMemberFailed?.Invoke(this, "Unable to save changes.");
 
         }
 
@@ -144,7 +137,6 @@ namespace WebClient.Services
                     TasksUpdated?.Invoke(this, null);
                     return;
                 }
-                //   UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
             }
         }
 

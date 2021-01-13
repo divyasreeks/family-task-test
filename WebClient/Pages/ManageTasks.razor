@@ -61,27 +61,23 @@
 
     private void OnAddItem()
     {
-        var task = new TaskVm()
-        {
-            Id = Guid.NewGuid(),
-            IsComplete = false,
-            Subject = newTask
-        };
-        //var task = new TaskModel()
-        //{
-        //    Id = Guid.NewGuid(),
-        //    IsDone = false,
-        //    Text = newTask
-        //};
+            var task = new TaskVm()
+            {
+                Id = Guid.NewGuid(),
+                IsComplete = false,
+                Subject = newTask
+            };
 
-        newTask = string.Empty;
+            newTask = string.Empty;
 
-        if (memberService.SelectedMember != null)
-        {
-            task.AssignedMemberId = memberService.SelectedMember.Id;
+            if (memberService.SelectedMember != null)
+            {
+                task.AssignedMemberId = memberService.SelectedMember.Id;
+            }
+            taskDataService.AddTask(task);
+            StateHasChanged();
         }
-        taskDataService.AddTask(task);
-        StateHasChanged();
+        
     }
 
 }
