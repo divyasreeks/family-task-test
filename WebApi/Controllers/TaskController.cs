@@ -22,6 +22,11 @@ namespace WebApi.Controllers
             _taskService = taskService;
         }
 
+        /// <summary>
+        /// Create method
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(CreateTaskCommandResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> Create(CreateTaskCommand command)
@@ -44,7 +49,12 @@ namespace WebApi.Controllers
         }
 
 
-
+        /// <summary>
+        /// Update method
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(UpdateTaskCommandResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> Update(Guid id, UpdateTaskCommand command)
@@ -66,6 +76,11 @@ namespace WebApi.Controllers
             }
         }
 
+        
+        /// <summary>
+        /// Fetch all tasks 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(GetAllTasksQueryResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()

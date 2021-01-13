@@ -17,29 +17,36 @@ namespace WebClient.Services
     public class TaskDataService : ITaskDataService
     {
         private readonly HttpClient httpClient;
+        public TaskVm SelectedTask { get; private set; }
+        public IEnumerable<TaskVm> tasks;
+        public IEnumerable<TaskVm> Tasks => tasks;
+
+        public event EventHandler TasksUpdated;
+        public event EventHandler TaskSelected;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="clientFactory"></param>
         public TaskDataService(IHttpClientFactory clientFactory)
         {
             httpClient = clientFactory.CreateClient("FamilyTaskAPI");
             tasks = new List<TaskVm>();
             LoadTasks();
         }
-
-        public TaskVm SelectedTask { get; private set; }
-
-        public IEnumerable<TaskVm> tasks;
-        public IEnumerable<TaskVm> Tasks => tasks;
-
-
-        public event EventHandler TasksUpdated;
-        public event EventHandler TaskSelected;
-
+        /// <summary>
+        /// method to load all tasks
+        /// </summary>
         private async void LoadTasks()
         {
             tasks = (await GetAllTasks()).Payload;
             TasksUpdated?.Invoke(this, null);
         }
 
-        
+        /// <summary>
+        /// Method to set the selected task details when user selects a particular task from UI
+        /// </summary>
+        /// <param name="id"></param>
         public void SelectTask(Guid id)
         {
             if (tasks.All(taskVm => taskVm.Id != id)) return;
@@ -49,7 +56,10 @@ namespace WebClient.Services
             }
         }
 
-        
+        /// <summary>
+        /// Toggle task completion status on check box click
+        /// </summary>
+        /// <param name="model"></param>
 
         public void ToggleTask(TaskVm model)
         {
@@ -66,6 +76,11 @@ namespace WebClient.Services
             TasksUpdated?.Invoke(this, null);
         }
 
+        /// <summary>
+        /// Create method
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         private async Task<CreateTaskCommandResult> Create(CreateTaskCommand command)
         {
             try
@@ -79,18 +94,31 @@ namespace WebClient.Services
             }
         }
 
+        /// <summary>
+        /// Method to fetch all tasks
+        /// </summary>
+        /// <returns></returns>
         private async Task<GetAllTasksQueryResult> GetAllTasks()
         {
             return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
         }
 
+        /// <summary>
+        /// Update method
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         private async Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command)
         {
             return await httpClient.PutJsonAsync<UpdateTaskCommandResult>($"tasks/{command.Id}", command);
         }
 
 
-       
+       /// <summary>
+       /// New Task creation
+       /// </summary>
+       /// <param name="model"></param>
+       /// <returns></returns>
 
         public async Task AddTask(TaskVm model)
         {
@@ -121,6 +149,12 @@ namespace WebClient.Services
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Update task
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
 
         public async Task UpdateTask(TaskVm model)
         {
